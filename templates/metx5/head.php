@@ -125,7 +125,7 @@ EOT;
 }else{
 echo <<<EOT
 -->
-			<li><a href="/member/login.php" title="{$_M['word']['memberGo']}" class="login">{$_M['word']['memberGo']}test</a></li>
+			<li><a href="/member/login.php" title="{$_M['word']['memberGo']}" class="login">{$_M['word']['memberGo']}</a></li>
 			<li><a href="/member/register_include.php?lang=cn" title="{$_M['word']['register']}" class="register">{$_M['word']['register']}</a></li>
 <!--
 EOT;
