@@ -109,7 +109,7 @@ $member_name = get_met_cookie('metinfo_member_name');
 if($member_name){
 echo <<<EOT
 -->
-			<li><a class="login">{$member_name}test</a>
+			<li><a class="login">{$member_name}</a>
 			    <dl data-postinok="1" style="display: none; width: auto; white-space: nowrap; min-width: 100px;"> 
 			      	<dd style="width: auto; min-width: 100px;"> 
 			     		<a href="/member/basic.php?lang=cn" title="个人信息">个人信息</a> 
