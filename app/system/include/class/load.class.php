@@ -129,6 +129,12 @@ class load {
 		return self::module(PATH_SYS_MODULE, $modulename);
 	}
 	
+		public static function is_plugin_exist($plugin){
+			global $_M;
+           $query = "SELECT * FROM {$_M['table']['app_plugin']} WHERE m_action = '{$plugin}' AND effect='1'";
+		   $result = DB::get_one($query);
+		   return $result;
+	}
 	/**
 	 * 加载插件
 	 * @param  string $plugin 需要加载的插件系统名

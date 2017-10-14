@@ -60,9 +60,14 @@ class sys_user extends user {
 			return false;
 		}
 		    $list = explode(",",$useridlist) ;
-		    //会员删除接口
-			$lists   = load::plugin('douserdel',1,$list);
-      if(is_array($lists)) $list = $lists;
+		    //系统会员删除接口
+			$userdelres  = load::plugin('douserdel',1,$list);
+
+            # $userdelres = NULL      说明插件不存在
+            # $userdelres = false     说明删除失败
+            # $userdelres = ture      说明删除成功
+            if($userdelres === false) return false;
+   
 		foreach($list as $id){
 			if($id){
 				if(is_number($id)){

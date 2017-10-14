@@ -1,7 +1,7 @@
 <!--<?php
 require_once template('head');
 require_once template('sidebar');
-$img[imgurl]=str_replace($navurl, $_M[url][site], $img[imgurl]);
+$img[imgurl_rel]=str_replace($navurl, $_M[url][site], $img[imgurl]);
 echo <<<EOT
 -->
 <div id="showimg">
@@ -9,7 +9,7 @@ echo <<<EOT
 		<ul class="am-slides my-simple-gallery am-gallery" data-am-widget="gallery" data-am-gallery="{pureview: 1}">
 			<li>
 				<div class="am-gallery-item">
-					<img src="{$thumb_src}dir={$img[imgurl]}&x=480&y=480" data-rel="{$img[imgurl]}" alt="{$img[title]}" />
+					<img src="{$thumb_src}dir={$img[imgurl]}&x=480&y=480" data-rel="{$img[imgurl_rel]}" alt="{$img[title]}" />
 					<h3 class="am-gallery-title">{$img[title]}</h3>
 				</div>
 			</li>
@@ -17,12 +17,12 @@ echo <<<EOT
 EOT;
 if(count($displaylist)>0){
 	foreach($displaylist as $key=>$val){
-		$val[imgurl]=str_replace($navurl, $_M[url][site], $val[imgurl]);
+		$val[imgurl_rel]=str_replace($navurl, $_M[url][site], $val[imgurl]);
 echo <<<EOT
 -->
 			<li>
 				<div class="am-gallery-item">
-					<img src="{$thumb_src}dir={$val[imgurl]}&x=480&y=480" data-rel="{$val[imgurl]}" alt="{$val[title]}" />
+					<img src="{$thumb_src}dir={$val[imgurl]}&x=480&y=480" data-rel="{$val[imgurl_rel]}" alt="{$val[title]}" />
 					<h3 class="am-gallery-title">{$val[title]}</h3>
 				</div>
 			</li>

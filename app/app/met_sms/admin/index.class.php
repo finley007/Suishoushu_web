@@ -24,7 +24,7 @@ class index extends admin {
 
         if($status['state'] == 0){
 
-            header("location:".$status['loginurl'].$_M['url']['own_form']."a=doindex");die;
+            header("location:".$status['loginurl'].urlencode($_M['url']['own_form']."a=doindex"));die;
         }
         $total  = $this->sms->get_total();
 

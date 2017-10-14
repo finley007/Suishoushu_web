@@ -45,7 +45,7 @@ class user {
         if (!$this->check_password($password)) {
             return false;
         }
-        # UC账号注册
+      
         $this->password = $password;
         $password = md5($password);
         return $this->insert_uesr_sql($username, $password, $email, $tel, $valid, $groupid, $source);
@@ -60,17 +60,25 @@ class user {
         if (!$password) {
             return false;
         }
+             #判断插件是否存在
+       
+         $isplugin = load::is_plugin_exist('doregister');
 
-        # UC账号注册接口
 
-        $mid = load::plugin('doregister', 1, array($username,$this->password,$email));
-        # $mid = false    说明插件不存在
-        # $mid = true     说明注册失败
-        # $mid    返回数字 说明注册成功
-        if($mid === true) return false;
-        $uid = '';
-        if (is_number($mid)) $uid = $mid;
-        # UC账号注册
+         if($isplugin){
+             # 系统账号注册接口
+             $registerres = load::plugin('doregister', 1, array($username,$this->password,$email));
+         }else{
+              $registerres=NULL;
+         }
+        
+        
+        # $registerres = NULL    说明插件不存在
+        # $registerres = false   说明注册失败
+        # $registerres = ture    说明注册成功
+        if($registerres === false) return false;
+        
+        # 系统账号注册
 
         if (!$groupid) {
             $group = $this->get_default_group();
@@ -79,23 +87,26 @@ class user {
         if (!$login_time) $login_time = time();
         if (!$register_time) $register_time = time();
         if (!$register_ip) $register_ip = get_userip();
+
         $query = "INSERT INTO {$_M['table']['user']} SET 
-						username = '{$username}',
-						password = '{$password}',
-						email    = '{$email}',
-						tel   	 = '{$tel}',
-						groupid  = '{$groupid}',
-						register_time = '{$register_time}',
-						register_ip = '{$register_ip}',
-						login_time  = '{$login_time}',
-						valid       = '{$valid}',
-						source      = '{$source}',
-                                                uid         = '{$uid}',
-						lang        = '{$this->lang}'
-		";
+                        username = '{$username}',
+                        password = '{$password}',
+                        email    = '{$email}',
+                        tel      = '{$tel}',
+                        groupid  = '{$groupid}',
+                        register_time = '{$register_time}',
+                        register_ip = '{$register_ip}',
+                        login_time  = '{$login_time}',
+                        valid       = '{$valid}',
+                        source      = '{$source}',
+                        lang        = '{$this->lang}'
+        ";
         if (DB::query($query)) {
-            return DB::insert_id();
+            $id= DB::insert_id();
+            load::plugin('doregistert', 0, array($id,$username,$this->password,$email));
+            return $id;
         } else {
+             load::plugin('doregisterf', 0, array($username,$this->password,$email));
             $this->errorno = "error_data";
             return false;
         }
@@ -107,19 +118,32 @@ class user {
         if (!$userid) {
             return false;
         }
+         $isplugin = load::is_plugin_exist('douseremail');
+         if($isplugin){
+            $useremail=load::plugin('douseremail', 1, array($userid,$email));
+         }else{
+            $useremail=NULL;
+         }
+        
+        # $useremail = NULL      说明插件不存在
+        # $useremail = false     说明修改失败
+        # $useremail = ture      说明修改成功
+         if($useremail === false) return false;
+
+         if($useremail !=NULL) $valid=1;
         $query = "UPDATE {$_M['table']['user']} SET
-			email    = '{$email}',
-			tel   	 = '{$tel}',
-			groupid  = '{$groupid}',
-			valid       = '{$valid}'
-			WHERE id = '{$userid}'
-		";
+            email    = '{$email}',
+            tel      = '{$tel}',
+            groupid  = '{$groupid}',
+            valid       = '{$valid}'
+            WHERE id = '{$userid}'
+        ";
         DB::query($query);
         return true;
     }
 
     /* 修改密码 */
-    public function editor_uesr_password($userid, $password) {
+    public function editor_uesr_password($userid, $password,$type=1) {
         global $_M;
         if (!$userid) {
             return false;
@@ -128,12 +152,19 @@ class user {
             return false;
         }
         
-        #UC 密码修改接口
-        $member = load::plugin('douseredit', 1, array(0,$userid,$_M['form']['oldpassword'],$password));
-        # $member = false    说明插件不存在
-        # $member = true     说明修改失败
-        # $member    返回$userid 的值
-        if($member === $userid || $member != TRUE ){
+       
+        $isplugin = load::is_plugin_exist('douserpass');
+        if($isplugin){
+             # 系统密码修改接口
+             $userpass = load::plugin('douserpass', 1, array($type,$userid,$_M['form']['oldpassword'],$password));
+        }else{
+             $userpass =NULL;
+        }
+      
+        # $userpass = NULL      说明插件不存在
+        # $userpass = false     说明修改失败
+        # $userpass = ture      说明修改成功
+        if($userpass || $userpass === NULL ){
             $password = md5($password);
             $query = "UPDATE {$_M['table']['user']} SET password = '{$password}' WHERE id = '{$userid}' ";
             DB::query($query);
@@ -150,12 +181,19 @@ class user {
         if ($this->get_user_by_email($email)) {
             return false;
         }
-        #UC 邮件修改接口
-        $member = load::plugin('douseredit', 1, array(1,$userid,'','',$email));
-        # $member = false    说明插件不存在
-        # $member = true     说明修改
-        # $member    返回$userid 的值
-        if($member === $userid || $member != TRUE ){
+        
+        $isplugin = load::is_plugin_exist('douseremail');
+        if($isplugin){
+           #系统邮件修改接口
+           $useremail = load::plugin('douseremail', 1, array($userid,$email));
+        }else{
+           $useremail=NULL;
+        }
+       
+        # $useremail = NULL   说明插件不存在
+        # $useremail = false  说明修改失败
+        # $useremail = ture   说明修改成功
+        if($useremail || $useremail === NULL ){
             $query = "UPDATE {$_M['table']['user']} SET email = '{$email}' WHERE id = '{$userid}' ";
             DB::query($query);
         }
@@ -171,7 +209,7 @@ class user {
         if ($this->get_user_by_tel($tel)) {
             return false;
         }
-        $query = "UPDATE {$_M['table']['user']} SET tel = '{$tel}' WHERE id = '{$userid}' ";
+        $query = "UPDATE {$_M['table']['user']} SET tel = '{$tel}' WHERE id = '{$userid}'";
         DB::query($query);
         return true;
     }
@@ -181,15 +219,13 @@ class user {
         global $_M;
         if ($this->check_str($username)) {
             //获取会员信息
-            # UC登陆
-            $userarr   = array($username,$password);
-            # UC登陆
+            # 插件登陆
+            load::plugin('douserlogin', 1, array($type,$username,$password));
+            # 插件登陆
             $user = $this->get_user_by_username($username);
             $password = md5($password);
             if ($user && ($user['password'] == $password || (md5(md5($user['password'])) == $password && $type = 'md5'))) {
-				# UC登陆接口
-                load::plugin('douserlogin', 1, $userarr);
-                # UC登陆
+                # 系统登陆接口
                 //将帐号和密码的加密字符串以及加密密钥写入cookie
                 $this->setauth($user['username'], $user['password']);
                 //完善会员信息的头像地址
@@ -215,10 +251,10 @@ class user {
         $login_count = $user['login_count'] ? $user['login_count'] + 1 : 1;
         $login_ip = get_userip();
         $query = "UPDATE {$_M['table']['user']} SET 
-			login_time  = '{$login_time}', 
-			login_count = '{$login_count}', 
-			login_ip    = '{$login_ip}' 
-			WHERE id    = '{$user[id]}' ";
+            login_time  = '{$login_time}', 
+            login_count = '{$login_count}', 
+            login_ip    = '{$login_ip}' 
+            WHERE id    = '{$user[id]}' ";
         DB::query($query);
     }
 
@@ -261,14 +297,20 @@ class user {
     //会员账号有效性检测 返回值false 
     public function get_user_by_username_sql($username) {
         global $_M;
-        $user = TRUE;
-        # UC账号检测接口
-        $membername = load::plugin('douserok', 1, $username);
-        # $membername = FALSE 说明插件不存在，需要进行本站检测
-        # $membername = TRUE 说明在UC表内重复，不再进行检测，
-        # $membername = $username 说明检测结果在UC可用，并再次进行本地数据库检测
+     
+        $isplugin = load::is_plugin_exist('douserok');
+        if($isplugin){
+             # 系统账号检测接口
+            $userokres = load::plugin('douserok', 1, $username);
+        }else{
+            $userokres =NULL;
+        }
+       
+        # $userokres = NULL  说明插件不存在，需要进行本站检测
+        # $userokres = false 说明在插件表内重复，不再进行检测，
+        # $userokres = ture  说明账号可用
         # 需注意采用全等比较 === 
-        if ($username === $membername || $membername != TRUE) {
+        if ($userokres || $userokres === NULL) {
             $user = self::get_user_by_nameid($username);
         }
         #返回 false 表示可注册。
@@ -484,14 +526,19 @@ class user {
     public function get_user_by_email($email) 
     {
         global $_M;
-        $user = TRUE;
-        # UC email检测接口
-        $memberemail = load::plugin('doemail', 1, $email);
-        # $memberemail = FALSE 说明插件不存在，需要进行本站检测
-        # $memberemail = TRUE 说明在UC表内重复，不再进行检测，
-        # $memberemail = $email 说明检测结果在UC可用，并再次进行本地数据库检测
-        # 需注意采用全等比较 === 
-        if ($email === $memberemail || $memberemail != TRUE) {
+     
+        $isplugin = load::is_plugin_exist('doemail');
+        if($isplugin){
+            # 系统email检测接口
+            $emailres = load::plugin('doemail', 1, $email);
+        }else{
+            $emailres =NULL;
+        }
+        
+        # $emailres = NULL  说明插件不存在，需要进行本站检测
+        # $emailres = false 说明在插件表内重复，不再进行检测，
+        # $emailres = ture  说明邮箱可用
+        if ($emailres ||  $emailres === NULL) {
             $user = self::get_user_by_emailid($email);
         }
         #返回 false 表示可注册。
@@ -521,9 +568,9 @@ class user {
         met_setcookie("acc_auth", '');
         met_setcookie("acc_key", '');
         $this->set_m('');
-        # UC 登陆退出接口
+        # 系统登陆退出接口
         load::plugin('dologout');
-        # UC 同步退出
+       
     }
 
 }

@@ -148,7 +148,7 @@ class profile extends userweb {
 	public function dopasssave() {
 		global $_M;	
 		if(md5($_M['form']['oldpassword'])==$_M['user']['password']){
-			if($this->userclass->editor_uesr_password($_M['user']['id'],$_M['form']['password'])){
+			if($this->userclass->editor_uesr_password($_M['user']['id'],$_M['form']['password'],0)){
 				okinfo($_M['url']['profile_safety'], $_M['word']['modifypasswordsuc']);
 			}else{
 				okinfo($_M['url']['profile_safety'], $_M['word']['opfail']);

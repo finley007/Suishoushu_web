@@ -23,6 +23,7 @@ var ownlangtxt = '';
 			<dd class="ftype_input">
 				<div class="fbox">
 					<input type="text" name="user_id" data-required="1" value="" placeholder="{$_M['word']['Prompt_user']}">
+					<span style="color:red">可用官网或交流论坛账号直接登录</span>
 				</div>
 			</dd>
 		</dl>
