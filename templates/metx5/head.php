@@ -150,7 +150,7 @@ foreach($met_flashimg as $key=>$val){
 $val[html] = $val[img_link]?"<a href=\"{$val[img_link]}\" title=\"{$val[img_title]}\"></a>":'';
 echo <<<EOT
 -->
-			<li style="background:url({$val[img_path]}) no-repeat center center; height:{$met_flasharray[$classnow][y]}px;">{$val[html]}</li>
+			<li style="background:url({$val[img_path]}) no-repeat center center; height:{$met_flasharray[$classnow][y]}px; background-size: contain">{$val[html]}</li>
 <!--
 EOT;
 }
