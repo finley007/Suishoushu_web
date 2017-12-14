@@ -25,6 +25,8 @@ gulp.task('copy', function() {
         .pipe(gulp.dest(serverLocation[options.env]))
 	gulp.src(['./**/*.css'])
         .pipe(gulp.dest(serverLocation[options.env]))
+  gulp.src(['./**/*.woff'])
+        .pipe(gulp.dest(serverLocation[options.env]))
 });
 
 gulp.task('default', function(callback) {
